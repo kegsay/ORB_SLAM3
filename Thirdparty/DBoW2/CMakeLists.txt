@@ -28,6 +28,8 @@ set(SRCS_DUTILS
   DUtils/Random.cpp
   DUtils/Timestamp.cpp)
 
+find_package(Boost)
+include_directories( ${Boost_INCLUDE_DIRS} )
 
 find_package(OpenCV 4 QUIET)
 if(NOT OpenCV_FOUND)

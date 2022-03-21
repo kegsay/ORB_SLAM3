@@ -140,6 +140,8 @@ public:
     void Shutdown();
     bool isShutDown();
 
+    void RunViewer();
+
     // Save camera trajectory in the TUM RGB-D dataset format.
     // Only for stereo and RGB-D. This method does not work for monocular.
     // Call first Shutdown()
@@ -234,7 +236,7 @@ private:
     // The Tracking thread "lives" in the main execution thread that creates the System object.
     std::thread* mptLocalMapping;
     std::thread* mptLoopClosing;
-    std::thread* mptViewer;
+    //std::thread* mptViewer;
 
     // Reset flag
     std::mutex mMutexReset;

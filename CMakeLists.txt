@@ -7,10 +7,25 @@ ENDIF()
 
 MESSAGE("Build type: " ${CMAKE_BUILD_TYPE})
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}  -Wall   -O3")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall   -O3")
-set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -march=native")
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=native")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}  -g   -O2 -fsanitize=address -fno-omit-frame-pointer")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g   -O2 -fsanitize=address -fno-omit-frame-pointer")
+set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE}")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
+
+
+#      set(OpenMP_CXX "${CMAKE_CXX_COMPILER}")
+#      set(OpenMP_CXX_FLAGS "-fopenmp=libomp -Wno-unused-command-line-argument")
+#      set(OpenMP_CXX_LIB_NAMES "libomp" "libgomp" "libiomp5")
+#      set(OpenMP_libomp_LIBRARY ${OpenMP_CXX_LIB_NAMES})
+#      set(OpenMP_libgomp_LIBRARY ${OpenMP_CXX_LIB_NAMES})
+#      set(OpenMP_libiomp5_LIBRARY ${OpenMP_CXX_LIB_NAMES})
+#        set(OpenMP_C "${CMAKE_C_COMPILER}")
+#        set(OpenMP_C_FLAGS "-fopenmp=libomp -Wno-unused-command-line-argument")
+#        set(OpenMP_C_LIB_NAMES "libomp" "libgomp" "libiomp5")
+#        set(OpenMP_libomp_LIBRARY ${OpenMP_C_LIB_NAMES})
+#        set(OpenMP_libgomp_LIBRARY ${OpenMP_C_LIB_NAMES})
+#        set(OpenMP_libiomp5_LIBRARY ${OpenMP_C_LIB_NAMES})
+
 
 # Check C++11 or C++0x support
 include(CheckCXXCompilerFlag)
@@ -41,6 +56,11 @@ MESSAGE(${OpenCV_VERSION})
 find_package(Eigen3 3.1.0 REQUIRED)
 find_package(Pangolin REQUIRED)
 find_package(realsense2)
+set(OPENSSL_ROOT_DIR "/usr/local/opt/openssl")
+find_package(openssl REQUIRED)
+
+find_package(Boost COMPONENTS serialization REQUIRED)
+
 
 include_directories(
 ${PROJECT_SOURCE_DIR}
@@ -49,6 +69,7 @@ ${PROJECT_SOURCE_DIR}/include/CameraModels
 ${PROJECT_SOURCE_DIR}/Thirdparty/Sophus
 ${EIGEN3_INCLUDE_DIR}
 ${Pangolin_INCLUDE_DIRS}
+${OPENSSL_INCLUDE_DIR}
 )
 
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib)
@@ -119,10 +140,10 @@ target_link_libraries(${PROJECT_NAME}
 ${OpenCV_LIBS}
 ${EIGEN3_LIBS}
 ${Pangolin_LIBRARIES}
-${PROJECT_SOURCE_DIR}/Thirdparty/DBoW2/lib/libDBoW2.so
-${PROJECT_SOURCE_DIR}/Thirdparty/g2o/lib/libg2o.so
--lboost_serialization
--lcrypto
+${PROJECT_SOURCE_DIR}/Thirdparty/DBoW2/lib/libDBoW2.dylib
+${PROJECT_SOURCE_DIR}/Thirdparty/g2o/lib/libg2o.dylib
+${OPENSSL_CRYPTO_LIBRARY}
+${Boost_SERIALIZATION_LIBRARY}
 )
 
 # If RealSense SDK is found the library is added and its examples compiled
@@ -214,6 +235,10 @@ if(realsense2_FOUND)
             Examples/Monocular/mono_realsense_D435i.cc)
     target_link_libraries(mono_realsense_D435i ${PROJECT_NAME})
 endif()
+
+#add_executable(mono_macbook
+#	Examples/Monocular/mono_macbook.cc)
+
 
 #Monocular inertial examples
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/Examples/Monocular-Inertial)
